@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  </head>
+  <body>
+    <script>
+      if(window.self!==window.top){
+        console.log("Framed");
+        console.log(window.self);
+        console.log(window.top);
+      }else{
+        console.log("Not framed");
+        console.log(window.self);
+        console.log(window.self);
+      }
+    </script>
+  </body>
+</html>

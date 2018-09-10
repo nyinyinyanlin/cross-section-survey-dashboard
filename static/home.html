@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <title></title>
+
+    <style>
+    @include media-breakpoint-up(sm) {
+    }
+    @include media-breakpoint-up(md) {
+    }
+    @include media-breakpoint-up(lg) {}
+    @include media-breakpoint-up(xl) {}
+
+    html, body {
+      overflow: hidden;
+      height:100%;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+   .container-fluid {
+    height: 100%;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  .row {
+      height: 100%;
+  }
+
+  .row-plot {
+    height: 60%;
+  }
+
+  .col-table {
+    height: 40%;
+    padding-right: 0!important;
+    padding-left: 0!important;
+  }
+
+  .no-scroll {
+    height: 55%;
+    overflow-y: scroll;
+    overflow-x: scroll;
+  }
+
+  .no-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .row-modify {
+    height: 40%;
+  }
+
+  .lg-col {
+    flex: 1 1 0; /* flex: 1, which you had before, is equivalent but doesn't work */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .list-group-flush {
+    height: 100%;
+    overflow-y: scroll;
+  }
+
+  #plot {
+    height: 100%;
+    padding-left: 0px;
+  }
+
+  #map {
+    height: 45%;
+  }
+
+  .list-group-item.active {
+    color: #333333;
+    background-color: transparent;
+    border-color: transparent;
+  }
+
+  .card {
+    border-radius: 0;
+    height: 100%
+  }
+
+  .dropdown-menu.show {
+    min-width: 5rem!important;
+  }
+
+  td {
+    padding-left: 20px;
+  }
+
+  .custom-file-input:lang(en)~.custom-file-label::after {
+    content: "Import";
+  }
+
+  .btn-group-sm>.btn, .btn-sm {
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+  #threejs {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    display: none;
+  }
+    </style>
+
+  </head>
+  <body>
+    <div id="threejs">
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+
+          <div class="col-sm-12 col-md-3 lg-col">
+            <div class="card">
+              <div class="card-header">
+                <p class="h4 float-left">Data List</p>
+                <div class="btn-group float-right">
+                  <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span id="list-badge"class="badge badge-light">0</span> Menu
+                  </button>
+                  <div class="dropdown-menu float-right">
+                    <a class="dropdown-item" href="#" id="clear-list">Clear</a>
+                    <a class="dropdown-item" href="#" id="threejs-render">Render</a>
+                  </div>
+                </div>
+                <div class="input-group" style="padding-top:10px">
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="file-input" accept=".json" multiple>
+                    <label class="custom-file-label" for="file-input">Choose File</label>
+                  </div>
+                </div>
+              </div>
+              <div class="list-group list-group-flush" id="data-list" role="tablist">
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-12 col-md-6" style="padding-right:0">
+              <div class="row row-plot">
+                <div id="plot" class="col"></div>
+              </div>
+              <div class="row row-modify" style="padding-right:0">
+                <div class="col-8">
+                  <div class="row">
+                    <div class="nav flex-column nav-pills col-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                      <a class="nav-link active" id="v-pills-modify-tab" data-toggle="pill" href="#v-pills-modify" role="tab" aria-controls="v-pills-modify" aria-selected="true">Modify</a>
+                      <a class="nav-link" id="v-pills-insert-tab" data-toggle="pill" href="#v-pills-insert" role="tab" aria-controls="v-pills-insert" aria-selected="false">Insert</a>
+                      <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Profile</a>
+                      <a class="nav-link" id="v-pills-map-tab" data-toggle="pill" href="#v-pills-map" role="tab" aria-controls="v-pills-map" aria-selected="false">Map</a>
+                      <a class="nav-link" id="v-pills-tools-tab" data-toggle="pill" href="#v-pills-tools" role="tab" aria-controls="v-pills-tools" aria-selected="false">Tools</a>
+                    </div>
+                    <div class="tab-content col-9" id="v-pills-tabContent">
+                      <div class="tab-pane fade show active" id="v-pills-modify" role="tabpanel" aria-labelledby="v-pills-modify-tab">
+                          <p class="h4">Modify selected point</p>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="elevation-addon1">Elevation</span>
+                            </div>
+                            <input type="number" class="form-control" placeholder="" aria-label="Elevation" aria-describedby="elevation-addon1" id="modify-elevation-input">
+                          </div>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="distance-addon1">Distance</span>
+                            </div>
+                            <input type="number" class="form-control" placeholder="" aria-label="Distance" aria-describedby="distance-addon1" id="modify-distance-input">
+                          </div>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <label class="input-group-text" for="update-select">To</label>
+                            </div>
+                            <select class="custom-select" id="update-select">
+                              <option value="none"  selected >None</option>
+                              <option value="left">Left</option>
+                              <option value="right">Right</option>
+                            </select>
+                            <div class="input-group-append">
+                              <button class="btn btn-outline-secondary" type="button" id="update-btn" disabled>Update</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger" id="delete-btn" disabled>Delete</button>
+                      </div>
+                      <div class="tab-pane fade" id="v-pills-insert" role="tabpanel" aria-labelledby="v-pills-insert-tab">
+                        <p class="h4">Insert a new point</p>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="elevation-addon2">Elevation</span>
+                          </div>
+                          <input type="number" class="form-control" placeholder="" aria-label="Elevation" aria-describedby="elevation-addon2" id="insert-elevation-input">
+                        </div>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="distance-addon2">Distance</span>
+                          </div>
+                          <input type="number" class="form-control" placeholder="" aria-label="Distance" aria-describedby="distance-addon2" id="insert-distance-input">
+                        </div>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <label class="input-group-text" for="insert-select">To</label>
+                          </div>
+                          <select class="custom-select" id="insert-select">
+                            <option value="none" selected>None</option>
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                          </select>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="insert-btn" disabled>Insert</button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                        <p class="h4">Modify Profile</p>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="profile-elevation-addon2">Elevation</span>
+                          </div>
+                          <input type="number" class="form-control" placeholder="" aria-label="Elevation" aria-describedby="profile-elevation-addon2" id="profile-elevation-input">
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="profile-btn" disabled>Update</button>
+                          </div>
+                        </div>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Chart</span>
+                          </div>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="profile-flipx-btn" disabled>Flip-X</button>
+                          </div>
+                          <div class="input-group-append">
+                            <span class="input-group-text">Map</span>
+                          </div>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="profile-map-draw-btn" disabled>Draw</button>
+                          </div>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="profile-map-clear-btn" disabled>Clear</button>
+                          </div>
+                        </div>
+                        <!--
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Terrain</span>
+                          </div>
+                            <select class="custom-select" id="profile-left-select">
+                              <option value="0"  selected >None</option>
+                              <option value="1">Sand</option>
+                              <option value="2">Rock</option>
+                              <option value="3">Bushes</option>
+                              <option value="4">Grass</option>
+                              <option value="5">Trees</option>
+                              <option value="6">Grass Bushes</option>
+                              <option value="7">Grass Trees</option>
+                              <option value="8">Grass Bushes Trees</option>
+                              <option value="9">Sand Rock</option>
+                              <option value="10">Mud</option>
+                            </select>
+                            <select class="custom-select" id="profile-bottom-select">
+                              <option value="0"  selected >None</option>
+                              <option value="1">Sand</option>
+                              <option value="2">Rock</option>
+                              <option value="3">Bushes</option>
+                              <option value="4">Grass</option>
+                              <option value="5">Trees</option>
+                              <option value="6">Grass Bushes</option>
+                              <option value="7">Grass Trees</option>
+                              <option value="8">Grass Bushes Trees</option>
+                              <option value="9">Sand Rock</option>
+                              <option value="10">Mud</option>
+                            </select>
+                            <select class="custom-select" id="profile-right-select">
+                              <option value="0"  selected >None</option>
+                              <option value="1">Sand</option>
+                              <option value="2">Rock</option>
+                              <option value="3">Bushes</option>
+                              <option value="4">Grass</option>
+                              <option value="5">Trees</option>
+                              <option value="6">Grass Bushes</option>
+                              <option value="7">Grass Trees</option>
+                              <option value="8">Grass Bushes Trees</option>
+                              <option value="9">Sand Rock</option>
+                              <option value="10">Mud</option>
+                            </select>
+                        </div>-->
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="profile-filename-addon1">File</span>
+                          </div>
+                          <input type="text" class="form-control" placeholder="*.json" aria-label="File Name" aria-describedby="profile-filename-addon1" id="profile-filename-input">
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="profile-download-btn" disabled>Download</button>
+                          </div>
+                        </div>
+                         <div class="input-group mb-3">
+                           <!--<div class="input-group-append">-->
+                             <button class="btn btn-outline-secondary" type="button" id="profile-export-btn" disabled>Export</button>
+                           <!--</div>-->
+                         </div>
+                      </div>
+                      <div class="tab-pane fade" id="v-pills-map" role="tabpanel" aria-labelledby="v-pills-map-tab">
+                        <p class="h4">Map Control</p>
+                        <div class="input-group mb-3">
+                          <div class="input-group-append">
+                            <span class="input-group-text">Profiles</span>
+                          </div>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="entire-map-draw-btn">Draw</button>
+                          </div>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="entire-map-clear-btn">Clear</button>
+                          </div>
+                        </div>
+                        <div class="input-group mb-3">
+                          <div class="input-group-append">
+                            <span class="input-group-text">L.Section</span>
+                          </div>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="ls-map-draw-btn">Draw</button>
+                          </div>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="ls-map-clear-btn">Clear</button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="tab-pane fade" id="v-pills-tools" role="tabpanel" aria-labelledby="v-pills-tools-tab">
+                        <p class="h4">Tools</p>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="tools-latitude-addon1">Latitude</span>
+                          </div>
+                          <input type="number" class="form-control" placeholder="" aria-label="Latitude" aria-describedby="tools-latitude-addon1" id="tools-latitude-input">
+                        </div>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="tools-longitude-addon1">Longitude</span>
+                          </div>
+                          <input type="number" class="form-control" placeholder="" aria-label="Longitude" aria-describedby="tools-longitude-addon1" id="tools-longitude-input">
+                        </div>
+                        <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <button class="btn btn-outline-secondary" type="button" id="tools-get-btn">Get</button>
+                        </div>
+                        <input type="number" class="form-control" placeholder="" aria-label="Elevation" aria-describedby="profile-elevation-addon2" id="tools-elevation-input">
+                        </div>
+                        <div class="input-group mb-3">
+                          <div class="input-group-append">
+                            <span class="input-group-text">L.Section Plot</span>
+                          </div>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="ls-plot-draw-btn">Draw</button>
+                          </div>
+                          <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="ls-plot-clear-btn">Clear</button>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+                </div>
+                <div class="col-4 float-right" style="padding-right:0">
+                  <table class="table table-striped" style="height:100%;padding-right:0">
+                    <tr>
+                      <td colspan="2"><strong>Selected Point<strong></td>
+                    </tr>
+                    <tr>
+                      <td>Latitude</td><td id="point-latitude">-</td>
+                    </tr>
+                    <tr>
+                      <td>Longitude</td><td id="point-longitude">-</td>
+                    </tr>
+                    <tr>
+                      <td>Distance</td><td id="point-distance">- m</td>
+                    </tr>
+                    <tr>
+                      <td>Elevation</td><td id="point-elevation">- m</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+          </div>
+
+          <div class="col-sm-12 col-md-3" style="overflow:hidden">
+            <div id="map" class="col-12"></div>
+            <div class="col-12 col-table no-scroll">
+              <table class="table table-striped table-dark" style="height:100%;width:100%;margin-bottom:0">
+                <tr>
+                  <td colspan="1">File</td>
+                  <td colspan="11"><small id="profile-file-name"></small></td>
+                </tr>
+                <tr>
+                  <td colspan="3">Coordinates</td>
+                  <td colspan="9"><small id="profile-coord"></small></td>
+                </tr>
+                <tr>
+                  <td colspan="3">Azimuth</td>
+                  <td colspan="3" id="profile-azimuth">-&deg;</td>
+                  <td colspan="3">Points</td>
+                  <td colspan="3" id="profile-data-count">-</td>
+                </tr>
+                <tr>
+                  <td colspan="6">Channel Width</td>
+                  <td colspan="6" id="profile-width">- m</td>
+                </tr>
+                <tr>
+                  <td colspan="3">Elev.  Range</td>
+                  <td colspan="9" id="profile-elevation-range">- m : - m</td>
+                </tr>
+                <tr>
+                  <td colspan="4" id="profile-left">-</td>
+                  <td colspan="4" id="profile-bottom">-</td>
+                  <td colspan="4" id="profile-right">-</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+        </div>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <script src="https://geographiclib.sourceforge.io/scripts/geographiclib.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4.js"></script>
+    <script src="threejs/three.min.js"></script>
+    <script src="threejs/js/geometries/ConvexGeometry.js"></script>
+    <script src="threejs/js/QuickHull.js"></script>
+    <script src="threejs/js/controls/OrbitControls.js"></script>
+    <script>
+    var dataset = []; //Global array for imported data
+    /* [
+        {
+        "file-name":,
+        "terrain":{"left":,"bottom":,"right":},
+        "azimuth":,
+        "data":[
+          [],[],[]
+        ],
+      }
+    ]
+    */
+    var geod = GeographicLib.Geodesic.WGS84; //Global Geodesic Object
+    var map; //Global Google Maps Object
+    var path; //Global Object for Google Maps Path drawn
+    var lsPath;
+    var entirePath;
+    var file_index;
+    var point_index;
+
+    function initMap(){
+       var wuntho = {lat:23.901695, lng:95.678726};
+        map = new google.maps.Map(document.getElementById('map'),{
+        zoom:18,
+        center: wuntho,
+        mapTypeId: 'satellite'
+      });
+    }
+
+    $(document).ready(function(){
+      drawPlot([]);
+
+      function processFile(file) {
+        var reader = new FileReader();
+        reader.onload = function(event) {
+          for (i in dataset){
+            if(file.name==dataset[i]["file-name"])return;
+          }
+          dataString = event.target.result;
+          jsonObj = JSON.parse(dataString);
+          if(jsonObj["terrain"] == null || jsonObj["data"].length == 0 || jsonObj["data"] == null) return;
+          jsonObj["file-name"] = file.name;
+          jsonObj["azimuth"] = geod.Inverse(jsonObj["data"][0][0],jsonObj["data"][0][1],jsonObj["data"][jsonObj["data"].length-1][0],jsonObj["data"][jsonObj["data"].length-1][1]).azi1;
+          dataset.push(jsonObj);
+          updateListBadge(dataset.length);
+          updateList();
+          updateFileIndex();
+        }
+        reader.readAsText(file);
+      }
+
+      function getProfileData(filename){
+        var profile = dataset.find(x => x["file-name"] === filename);
+        var elevRange = getElevRange(profile["data"]);
+        updateProfileTable(
+          filename,
+          [profile["data"][0][0],profile["data"][0][1]],
+          [profile["data"][profile["data"].length-1][0],profile["data"][profile["data"].length-1][1]],
+          profile["azimuth"],
+          profile["data"].length,
+          profile["data"][profile["data"].length-1][2],
+          elevRange.min.toFixed(2),
+          elevRange.max.toFixed(2),
+          profile["terrain"].left,
+          profile["terrain"].bottom,
+          profile["terrain"].right
+        );
+        file_index = getFileIndex($("#profile-file-name").html());
+        drawPlot(profile["data"]);
+        drawMap(profile["data"]);
+        $("#update-btn").removeAttr("disabled");
+        $("#insert-btn").removeAttr("disabled");
+        $("#delete-btn").removeAttr("disabled");
+        $("#profile-btn").removeAttr("disabled");
+        $("#profile-flipx-btn").removeAttr("disabled");
+        $("#profile-map-draw-btn").removeAttr("disabled");
+        $("#profile-map-clear-btn").removeAttr("disabled");
+        $("#profile-download-btn").removeAttr("disabled");
+        $("#profile-export-btn").removeAttr("disabled");
+      }
+
+      function drawMap(data){
+        var mapsData = [];
+        var center = {'lat':0,'lng':0};
+        for(i in data){
+          mapsData[i] = {'lat': data[i][0],'lng': data[i][1]};
+          center.lat += mapsData[i].lat;
+          center.lng += mapsData[i].lng;
+        }
+        center = {'lat':(center.lat/data.length),'lng':(center.lng/data.length)};
+        if(path)path.setMap(null);
+        path = new google.maps.Polyline({
+          path: mapsData,
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.7,
+          strokeWeight:4
+        });
+        path.setMap(map);
+        map.setCenter(center);
+      }
+
+      function drawLsMap(){
+        var lsMapData = [];
+        for(i in dataset){
+          lsMapData[i] = {
+            'lat':(dataset[i]["data"][0][0]+dataset[i]["data"][dataset[i]["data"].length-1][0])/2,
+            'lng':(dataset[i]["data"][0][1]+dataset[i]["data"][dataset[i]["data"].length-1][1])/2
+          }
+        }
+        if(lsPath)lsPath.setMap(null);
+        lsPath = new google.maps.Polyline({
+          path: lsMapData,
+          geodesic: true,
+          strokeColor: '#00FF00',
+          strokeOpacity: 0.7,
+          strokeWeight:2
+        });
+        lsPath.setMap(map);
+      }
+
+      function clearLsMap(){
+        if(lsPath)lsPath.setMap(null);
+      }
+
+      function drawEntireMap(){
+        entirePath = [];
+        for(i in dataset){
+          if(entirePath[i])entirePath[i].setMap(null);
+          var data = [{"lat":parseFloat(dataset[i]["data"][0][0]),
+            "lng":parseFloat(dataset[i]["data"][0][1])},
+          {"lat":parseFloat(dataset[i]["data"][dataset[i]["data"].length-1][0]),
+            "lng":parseFloat(dataset[i]["data"][dataset[i]["data"].length-1][1])}];
+          entirePath[i] =   new google.maps.Polyline({
+          path: data,
+          geodesic: true,
+          strokeColor: '#00FF00',
+          strokeOpacity: 0.7,
+          strokeWeight:2,
+          filename:dataset[i]["file-name"]
+          });
+          entirePath[i].setMap(map);
+          google.maps.event.addListener(entirePath[i], 'click', function (event) {
+            getProfileData(this.filename);
+          });
+      }
+    }
+
+      function clearEntireMap(){
+        for(i in entirePath){
+          if(entirePath[i])entirePath[i].setMap(null);
+        }
+        entirePath = [];
+      }
+
+      function removeProfileData(filename){
+        dataset.splice(getFileIndex(filename),1);
+        if(filename==$("#profile-file-name").html()){
+          file_index = null;
+          point_index = null;
+          updateProfileTable("",[0,0],[0,0],0,0,0,0,0,"","","");
+          updatePointTable(0,0,0,0);
+          updateModifyTab(0,0);
+          updateInsertTab(0,0);
+          $("#tools-latitude-input").val('');
+          $("#tools-longitude-input").val('');
+          $("#tools-elevation-input").val('');
+          drawPlot([]);
+          path.setMap(null);
+          $("#update-btn").attr("disabled","");
+          $("#insert-btn").attr("disabled","");
+          $("#delete-btn").attr("disabled","");
+          $("#profile-btn").attr("disabled","");
+          $("#profile-flipx-btn").attr("disabled","");
+          $("#profile-map-draw-btn").attr("disabled","");
+          $("#profile-map-clear-btn").attr("disabled","");
+          $("#profile-download-btn").attr("disabled","");
+          $("#profile-download-btn").attr("disabled","");
+        } else {
+          updateFileIndex();
+        }
+        updateListBadge(dataset.length);
+        updateList();
+      }
+
+      function getElevRange(data){
+        var min = data[0][3];
+        var max = min;
+        for(var i=1;i<data.length-1;i++){
+          if(data[i][3]<min)min=data[i][3];
+          if(data[i][3]>max)max=data[i][3];
+        }
+        return {"min":min,"max":max};
+      }
+
+      function updatePointTable(latitude,longitude,distance,elevation){
+        $("#point-latitude").html(latitude.toFixed(6));
+        $("#point-longitude").html(longitude.toFixed(6));
+        $("#point-distance").html(distance.toFixed(2)+"m");
+        $("#point-elevation").html(elevation.toFixed(2)+"m");
+      }
+
+      function updateProfileTable(filename,startCoord,endCoord,azimuth,point,width,minElev,maxElev,leftBank,bottom,rightBank){
+        $("#profile-file-name").html(filename);
+        $("#profile-coord").html("["+startCoord[0].toFixed(6)+","+startCoord[1].toFixed(6)+"] ["+endCoord[0].toFixed(6)+","+endCoord[1].toFixed(6)+"]");
+        $("#profile-azimuth").html(azimuth.toFixed(2)+"&deg;");
+        $("#profile-data-count").html(point);
+        $("#profile-width").html(width.toFixed(2)+"m");
+        $("#profile-elevation-range").html(minElev+"m : "+maxElev+"m");
+        $("#profile-left").html(getTerrainType(leftBank));
+        $("#profile-bottom").html(getTerrainType(bottom));
+        $("#profile-right").html(getTerrainType(rightBank));
+      }
+
+      function updateInsertTab(elevation,distance){
+        $("#insert-distance-input").attr("placeholder",distance.toFixed(2)+"+");
+        $("#insert-elevation-input").attr("placeholder",elevation.toFixed(2)+"+");
+      }
+
+      function updateModifyTab(elevation,distance){
+        $("#modify-distance-input").attr("placeholder",distance.toFixed(2)+"+");
+        $("#modify-elevation-input").attr("placeholder",elevation.toFixed(2)+"+");
+      }
+
+      function updateListBadge(count){
+        $("#list-badge").html(count);
+      }
+
+      function updateList(){
+        $("#data-list").empty();
+        for(var i=0;i<dataset.length;i++){
+          var child =  '<a href="#" class="list-group-item list-group-item-action" data-toggle="list" role="tab"><div class="col-12 list-file-name">'+dataset[i]["file-name"]+'</div><div style="display:none" class="col-12 btn-gp"><button class="btn btn-outline-primary btn-sm list-btn-view">View</button><button class="btn btn-outline-primary btn-sm">Download</button><button class="btn btn-outline-danger btn-sm list-btn-remove">Remove</button></div></a>';
+          $("#data-list").append(child);
+        }
+        $('a[data-toggle="list"]').on('shown.bs.tab',function(e){
+          $(e.relatedTarget).children(".btn-gp").hide('slow');
+          $(e.target).children(".btn-gp").show('slow');
+        });
+        $('.list-btn-view').on("click",function(e){
+          getProfileData($(this).parent().siblings(".list-file-name").html());
+        });
+        $('.list-btn-remove').on("click",function(e){
+          removeProfileData($(this).parent().siblings(".list-file-name").html());
+        });
+      }
+
+      function updateFileIndex(){
+        file_index = getFileIndex($("#profile-file-name").html());
+      }
+
+      function clearAll(){
+        file_index = null;
+        point_index = null;
+        updateProfileTable("",[0,0],[0,0],0,0,0,0,0,"","","");
+        updatePointTable(0,0,0,0);
+        updateModifyTab(0,0);
+        updateInsertTab(0,0);
+        $("#tools-latitude-input").val('');
+        $("#tools-longitude-input").val('');
+        $("#tools-elevation-input").val('');
+        drawPlot([]);
+        if(path)path.setMap(null);
+        for(i in entirePath){
+          if(entirePath[i])entirePath[i].setMap(null);
+        }
+        entirePath = [];
+        dataset = [];
+        updateList();
+        updateListBadge(dataset.length);
+        $("#update-btn").attr("disabled","");
+        $("#insert-btn").attr("disabled","");
+        $("#delete-btn").attr("disabled","");
+        $("#profile-btn").attr("disabled","");
+        $("#profile-flipx-btn").attr("disabled","");
+        $("#profile-map-draw-btn").attr("disabled","");
+        $("#profile-map-clear-btn").attr("disabled","");
+        $("#profile-download-btn").attr("disabled","");
+        $("#profile-export-btn").attr("disabled","");
+      }
+
+      function comparePts(a, b){
+        let comparison = 0;
+        if (a[2] > b[2]) {
+          comparison = 1;
+        } else if (b[2] > a[2]) {
+          comparison = -1;
+        }
+        return comparison;
+      }
+
+      function sortData(index){
+        dataset[index]["data"].sort(comparePts);
+      }
+
+      function exportDataset(data){
+        var text = "station;X;Y;Z\n";
+        var totalDist = 0;
+        var proj = "+proj=utm +zone=46 +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
+        for(var j=0;j<data[0]["data"].length-1;j++){
+          var point = proj4(proj,[data[0]["data"][j][1],data[0]["data"][j][0]]);
+          text = text.concat("0;"+point[0]+";"+point[1]+";"+data[0]["data"][j][3].toFixed(4)+"\n");
+        }
+        for(var i=1;i<data.length;i++){
+          var inv = geod.Inverse(
+            (data[i-1]["data"][0][0]+data[i-1]["data"][data[i-1]["data"].length-1][0])/2,
+            (data[i-1]["data"][0][1]+data[i-1]["data"][data[i-1]["data"].length-1][1])/2,
+            (data[i]["data"][0][0]+data[i]["data"][data[i]["data"].length-1][0])/2,
+            (data[i]["data"][0][1]+data[i]["data"][data[i]["data"].length-1][1])/2);
+          totalDist += (inv.s12/1000);
+          for(var k=0;k<data[i]["data"].length-1;k++){
+            var point = proj4(proj,[data[i]["data"][k][1],data[i]["data"][k][0]]);
+            text = text.concat(totalDist.toFixed(6)+";"+point[0]+";"+point[1]+";"+data[i]["data"][k][3].toFixed(4)+"\n");
+          }
+        }
+        download(text,"daung_myu_profile_utm_46n.txt","plain/text");
+      }
+
+      function download(data, filename, type) {
+          var file = new Blob([data], {type: type});
+          if (window.navigator.msSaveOrOpenBlob) // IE10+
+              window.navigator.msSaveOrOpenBlob(file, filename);
+          else { // Others
+              var a = document.createElement("a"),
+                      url = URL.createObjectURL(file);
+              a.href = url;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              setTimeout(function() {
+                  document.body.removeChild(a);
+                  window.URL.revokeObjectURL(url);
+              }, 0);
+          }
+      }
+
+      function getTerrainType(id){
+        var terrain = "";
+        switch(id){
+          case 1: terrain = "Sand";
+            break;
+          case 2:terrain = "Rock";
+            break;
+          case 3:terrain = "Bushes";
+            break;
+          case 4:terrain = "Grass";
+            break;
+          case 5:terrain = "Trees"
+            break;
+          case 6:terrain = "Grass Bushes";
+            break;
+          case 7:terrain = "Grass Trees";
+            break;
+          case 8:terrain = "Grass Bushes Trees";
+            break;
+          case 9:terrain = "Sand Rock";
+            break;
+          case 10:terrain = "Mud";
+            break;
+        }
+        return terrain;
+      }
+
+      function getGoogleMapsElevation(lat,lng){
+        var url = "https://maps.googleapis.com/maps/api/elevation/json?locations="+lat+","+lng+"&key=AIzaSyDt-IRfqD_RTeLBXpr9ARzzQpefHLqzvj0";
+        $.ajax({
+          type: "GET",
+          url: url,
+          ContentType: 'application/json; charset=utf-8',
+          dataType: 'json',
+          crossDomain:true,
+          success: function(data){
+            $("#tools-elevation-input").val(data.results[0].elevation);
+          }
+        });
+      }
+
+      function getFileIndex(filename){
+        return dataset.map(function(obj) { return obj["file-name"]; }).indexOf(filename);
+      }
+
+      function drawLsPlot(data){
+        var plot = document.getElementById("plot");
+        var minElev = {x:[0],y:[getElevRange(data[0]["data"]).min]};
+        var maxElev = {x:[0],y:[getElevRange(data[0]["data"]).max]};
+        var totalDist = 0;
+        for(var i=1;i<data.length;i++){
+          var elev = getElevRange(data[i]["data"]);
+          var inv = geod.Inverse(
+            (data[i-1]["data"][0][0]+data[i-1]["data"][data[i-1]["data"].length-1][0])/2,
+            (data[i-1]["data"][0][1]+data[i-1]["data"][data[i-1]["data"].length-1][1])/2,
+            (data[i]["data"][0][0]+data[i]["data"][data[i]["data"].length-1][0])/2,
+            (data[i]["data"][0][1]+data[i]["data"][data[i]["data"].length-1][1])/2);
+          totalDist += inv.s12;
+          minElev.x[i] = totalDist;
+          maxElev.x[i] = totalDist;
+          minElev.y[i] = elev.min;
+          maxElev.y[i] = elev.max;
+        }
+        Plotly.newPlot(plot, [minElev,maxElev], { margin: {t:10,r:20,b:20,l:20},yaxis:{scaleanchor:"x"},hovermode:'closest'});
+      }
+
+      function clearLsPlot(){
+        if(file_index!=null&&file_index>=0){
+          drawPlot(dataset[file_index]["data"]);
+        }else{
+          drawPlot([]);
+        }
+      }
+
+      function drawPlot(data){
+        var plot = document.getElementById("plot");
+        var points = [{x:[],y:[]}];
+        for(i in data){
+          points[0].x[i] = data[i][2];
+          points[0].y[i] = data[i][3];
+        }
+        Plotly.newPlot(plot, points, { margin: {t:10,r:20,b:20,l:20},yaxis:{scaleanchor:"x"},hovermode:'closest'});
+        plot.on("plotly_click",function(data){
+          point_index = dataset[file_index]["data"].map(function(obj) { return obj[2]; }).indexOf(data.points[0].x);
+          $("#tools-latitude-input").val(dataset[file_index]["data"][point_index][0]);
+          $("#tools-longitude-input").val(dataset[file_index]["data"][point_index][1]);
+          updatePointTable(dataset[file_index]["data"][point_index][0],dataset[file_index]["data"][point_index][1],dataset[file_index]["data"][point_index][2],dataset[file_index]["data"][point_index][3]);
+          updateModifyTab(dataset[file_index]["data"][point_index][3],dataset[file_index]["data"][point_index][2]);
+          updateInsertTab(dataset[file_index]["data"][point_index][3],dataset[file_index]["data"][point_index][2]);
+        });
+      }
+
+      updateProfileTable("",[0,0],[0,0],0,0,0,0,0,"","","");
+      updatePointTable(0,0,0,0);
+
+      $("#file-input").change(function() {
+          for(var i=0;i<this.files.length;i++){
+            processFile(this.files[i]);
+          }
+      });
+
+      $("#delete-btn").on("click",function(){
+        dataset[file_index]["data"].splice(point_index,1);
+        getProfileData($("#profile-file-name").html());
+      });
+
+      $("#update-btn").on("click",function(){
+        if($("#modify-elevation-input").val()){
+          dataset[file_index]["data"][point_index][3] += parseFloat($("#modify-elevation-input").val());
+        }
+        if($("#update-select").val()!=="none" && $("#modify-distance-input").val()){
+          var dist = parseFloat($("#modify-distance-input").val());
+          if($("#update-select").val()=="left"){
+            dist = -Math.abs(dist);
+          }else{
+            dist = Math.abs(dist);
+          }
+          dataset[file_index]["data"][point_index][2] += dist;
+          var direct =  geod.Direct(dataset[file_index]["data"][0][0],dataset[file_index]["data"][0][1],dataset[file_index]["azimuth"],dataset[file_index]["data"][point_index][2]);
+          dataset[file_index]["data"][point_index][0] = direct.lat2;
+          dataset[file_index]["data"][point_index][1] = direct.lon2;
+          dist = dataset[file_index]["data"][point_index][2];
+          sortData(file_index);
+          point_index = dataset[file_index]["data"].map(function(obj) { return obj[2]; }).indexOf(dist);
+        }
+        updatePointTable(dataset[file_index]["data"][point_index][0],dataset[file_index]["data"][point_index][1],dataset[file_index]["data"][point_index][2],dataset[file_index]["data"][point_index][3]);
+        updateModifyTab(dataset[file_index]["data"][point_index][3],dataset[file_index]["data"][point_index][2]);
+        updateInsertTab(dataset[file_index]["data"][point_index][3],dataset[file_index]["data"][point_index][2]);
+        getProfileData($("#profile-file-name").html());
+      });
+
+      $("#insert-btn").on("click",function(){
+        if($("#insert-elevation-input").val() && $("#insert-distance-input") && $("#insert-select").val()!="none"){
+          var dist = parseFloat($("#insert-distance-input").val());
+          if($("#insert-select").val()=="left"){
+            dist = -Math.abs(dist);
+          }else{
+            dist = Math.abs(dist);
+          }
+          dist += dataset[file_index]["data"][point_index][2];
+          var elevation = parseFloat($("#insert-elevation-input").val()) + dataset[file_index]["data"][point_index][3];
+          var direct =  geod.Direct(dataset[file_index]["data"][0][0],dataset[file_index]["data"][0][1],dataset[file_index]["azimuth"],dist);
+          dataset[file_index]["data"].push([direct.lat2,direct.lon2,dist,elevation]);
+          sortData(file_index);
+          point_index = dataset[file_index]["data"].map(function(obj) { return obj[2]; }).indexOf(dist);
+        }
+        updatePointTable(dataset[file_index]["data"][point_index][0],dataset[file_index]["data"][point_index][1],dataset[file_index]["data"][point_index][2],dataset[file_index]["data"][point_index][3]);
+        updateModifyTab(dataset[file_index]["data"][point_index][3],dataset[file_index]["data"][point_index][2]);
+        updateInsertTab(dataset[file_index]["data"][point_index][3],dataset[file_index]["data"][point_index][2]);
+        getProfileData($("#profile-file-name").html());
+      });
+
+      $("#profile-btn").on("click",function(){
+        if($("#profile-elevation-input").val()){
+          var elevation_change = parseFloat($("#profile-elevation-input").val());
+          for(i in dataset[file_index]["data"]){
+            dataset[file_index]["data"][i][3] += elevation_change;
+          }
+          updatePointTable(dataset[file_index]["data"][point_index][0],dataset[file_index]["data"][point_index][1],dataset[file_index]["data"][point_index][2],dataset[file_index]["data"][point_index][3]);
+          updateModifyTab(dataset[file_index]["data"][point_index][3],dataset[file_index]["data"][point_index][2]);
+          updateInsertTab(dataset[file_index]["data"][point_index][3],dataset[file_index]["data"][point_index][2]);
+          getProfileData($("#profile-file-name").html());
+        }
+      });
+
+      $("#profile-flipx-btn").on("click",function(){
+        dataset[file_index]["data"].reverse();
+        var width = dataset[file_index]["data"][0][2];
+        for(i in dataset[file_index]["data"]){
+          dataset[file_index]["data"][i][2] = width - dataset[file_index]["data"][i][2];
+        }
+        dataset[file_index]["azimuth"] = geod.Inverse(dataset[file_index]["data"][0][0],dataset[file_index]["data"][0][1],dataset[file_index]["data"][dataset[file_index]["data"].length-1][0],dataset[file_index]["data"][dataset[file_index]["data"].length-1][1]).azi1;
+        point_index = dataset[file_index]["data"].length - point_index -1;
+        updatePointTable(dataset[file_index]["data"][point_index][0],dataset[file_index]["data"][point_index][1],dataset[file_index]["data"][point_index][2],dataset[file_index]["data"][point_index][3]);
+        updateModifyTab(dataset[file_index]["data"][point_index][3],dataset[file_index]["data"][point_index][2]);
+        updateInsertTab(dataset[file_index]["data"][point_index][3],dataset[file_index]["data"][point_index][2]);
+        getProfileData($("#profile-file-name").html());
+      });
+
+      $("#profile-map-draw-btn").on("click",function(){
+        drawMap(dataset[file_index]["data"]);
+      });
+
+      $("#profile-map-clear-btn").on("click",function(){
+        if(path)path.setMap(null);
+      });
+
+      $("#entire-map-draw-btn").on("click",function(){
+        drawEntireMap();
+      });
+
+      $("#entire-map-clear-btn").on("click",function(){
+        clearEntireMap();
+      });
+
+      $("#ls-map-draw-btn").on("click",function(){
+        drawLsMap();
+      });
+
+      $("#ls-map-clear-btn").on("click",function(){
+        clearLsMap();
+      });
+
+      $("#tools-get-btn").on("click",function(){
+        if($("#tools-latitude-input").val()&&$("#tools-longitude-input")){
+          getGoogleMapsElevation(parseFloat($("#tools-latitude-input").val()),parseFloat($("#tools-longitude-input").val()));
+        }
+      });
+
+      $("#profile-download-btn").on("click",function(){
+        var filename = $("#profile-filename-input").val();
+        if(filename.length>0){
+          var jsonObj = {"terrain":dataset[file_index]["terrain"],"data":dataset[file_index]["data"]};
+          download(JSON.stringify(jsonObj),filename + ".json","application/json");
+        }
+      });
+
+      $("#profile-export-btn").on("click",function(){/*
+        var filename = $("#profile-filename-input").val();
+        if(filename.length<1){
+          filename = dataset[file_index]["file-name"].slice(0,-5);
+        }
+        if(filename.length>0){
+          var profile = dataset[file_index];
+          var text = profile.terrain.left + " " + profile.terrain.bottom + " " + profile.terrain.right+"\n";
+          for(i in profile.data){
+            text = text.concat(profile.data[i][2].toFixed(2)+"\t"+profile.data[i][3].toFixed(2)+"\t"+profile.data[i][0].toFixed(7)+"\t"+profile.data[i][1].toFixed(7)+"\n");
+          }
+          download(text,filename + ".txt","plain/text");
+        }*/
+        exportDataset(dataset);
+      });
+
+      $("#ls-plot-draw-btn").on("click",function(){
+        drawLsPlot(dataset);
+      });
+
+      $("#ls-plot-clear-btn").on("click",function(){
+        clearLsPlot();
+      });
+
+      $("#clear-list").on("click",function(){
+        clearAll();
+      });
+
+      $("#threejs-render").on("click",function(){
+        $("#threejs").show();
+        //threejs();
+        scatter3d();
+      });
+      //23.915928, 95.685918
+      //23.915996, 95.685097
+      //-84.85151857539171
+      //83.93096420909832
+      /*let profile = dataset[25]["data"].map((val, i, arr) => {
+        console.log(arr[arr.length-1][2]);
+        return jsmap(val,0,arr[arr.length-1][2],0,83.93096420909832);
+      });
+
+      dataset[25]["data"].map((val, i, arr) => {
+        var dir = geod.Direct(23.915928, 95.685918,-84.85151857539171,val[2]);
+        dataset[25]["data"][i][0] = dir.lat2;
+        dataset[25]["data"][i][1] = dir.lon2;
+      });*/
+
+      function deg2rad(degrees)
+      {
+        var pi = Math.PI;
+        return degrees * (pi/180);
+      }
+
+      function scatter3d(){
+        var proj = "+proj=utm +zone=46 +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
+        var plot = document.getElementById("threejs");
+        	var x = [];
+          var y = [];
+          var z = [];
+          for(i in dataset){
+            let profile = dataset[i];
+            for(j in profile.data){
+              //var point = proj4(proj,[profile.data[j][1],profile.data[j][0]]);
+              x[x.length] = profile.data[j][1];//point[0];
+              y[y.length] = profile.data[j][0];//point[1];
+              z[z.length] = profile.data[j][3];
+            }
+          }
+          var trace1 = {
+          x: x,
+          y: y,
+          z: z,
+        	//mode: 'markers',
+        	/*marker: {
+        		size: 2,
+        		line: {
+        		color: 'rgba(217, 217, 217, 0.14)',
+        		width: 0.5},
+        		opacity: 0.8},*/
+            opacity:1,
+        color:"rgba(200,200,200,1)",
+        type: 'mesh3d'
+        };
+        var layout = {
+            scene:{
+              aspectmode: "manual",
+              aspectratio: {
+                x: 1,
+                y: 1,
+                z: (1/20.32),
+              },
+                margin: {
+              	   l: 0,
+              	    r: 0,
+              	     b: 0,
+              	      t: 0
+                    },
+                xaxis: {
+                  scaleanchor: "y"
+                },
+                zaxis: {
+                  scaleanchor: "y"
+                }
+            }
+        };
+        Plotly.newPlot(plot,[trace1],layout);
+      }
+
+      function threejs(){
+          var scene = new THREE.Scene();
+          var camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+          camera.position.z = 4;
+          var renderer = new THREE.WebGLRenderer({
+            alpha: true // remove canvas' bg color
+          });
+          var axesHelper = new THREE.AxesHelper( 3 );
+          scene.add( axesHelper );
+          var controls = new THREE.OrbitControls( camera );
+          renderer.setClearColor("#000000");
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          document.getElementById("threejs").appendChild( renderer.domElement );
+
+          var points = [];
+
+          var proj = "+proj=utm +zone=46 +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
+          for(i in dataset){
+            let profile = dataset[i];
+            for(j in profile.data){
+              var point = proj4(proj,[profile.data[j][1],profile.data[j][0]]);
+              //z = R * Math.sin(lat);
+              //points[points.length] = new THREE.Vector3(jsmap(point[0],772500,772700,0,10),jsmap(point[1],2645600,,profile.data[j][3]);
+            }
+          }
+          console.log(points);
+          var geometry = new THREE.ConvexGeometry(points);
+          console.log(geometry);
+          var material = new THREE.MeshBasicMaterial( { color: "#433F81" } );
+          var cube = new THREE.Mesh( geometry, material );
+          scene.add(cube);
+          var render = function () {
+          requestAnimationFrame( render );
+          controls.update();
+          renderer.render(scene, camera);
+        };
+        render();
+      }
+
+      function jsmap( x,  in_min,  in_max,  out_min,  out_max){
+        console.log({x,in_min,in_max,out_min,out_max});
+        return ((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
+      }
+    });
+  </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnpYbxxxuxaIcQy30WPGNDlYphtPJ0cZk&callback=initMap"></script>
+  </body>
+</html>

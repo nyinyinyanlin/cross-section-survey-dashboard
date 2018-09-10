@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.css">
+    <style>
+
+      html {
+        margin: 0px;
+        padding: 0px;
+        height: 100%;
+        width: 100%;
+      }
+
+      body.application {
+        background-color: #f2f2f2;
+        padding: 65px 20px 0px 20px;
+      }
+
+      body.application > .container-fluid {
+        padding-left: 0;
+        padding-right: 0;
+      }
+      body.application div[class^="col-"] {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      body.application div[class^="col-"] div[class^="col-"] {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+
+      body.application hr {
+        border-color: #d7d7d7;
+        margin: 10px 0;
+      }
+
+      .chart-wrapper {
+        background: #fff;
+        border: 1px solid #e2e2e2;
+        border-radius: 3px;
+        margin-bottom: 10px;
+      }
+
+      .chart-wrapper .chart-title {
+        border-bottom: 1px solid #d7d7d7;
+        color: #666;
+        font-size: 14px;
+        font-weight: 200;
+        padding: 10px 10px 2px;
+      }
+
+      .chart-wrapper .chart-stage {
+        /*min-height: 240px;*/
+        overflow: hidden;
+        padding: 5px 10px;
+        position: relative;
+      }
+
+      .chart-wrapper .chart-notes {
+        background: #fbfbfb;
+        border-top: 1px solid #e2e2e2;
+        color: #808080;
+        font-size: 12px;
+        padding: 8px 10px 0px;
+      }
+
+      .info {
+        color: #707070;
+        font-size: 14px;
+      }
+
+      .chart-wrapper .chart-notes p {
+        margin-bottom: 5px;
+      }
+
+      .plot {
+        height:350px;
+        width: 100%;
+      }
+
+      .addmore {
+        height: 100px;
+        width: 100%;
+        border: 1px;
+        background-color: white;
+      }
+
+      .icon-bar {
+        background-color:#FF0000 !important;
+      }
+
+      .navbar {
+        background-color: #FFFFFF!important;
+        box-shadow: 0px 1px 1px 1px #BBB;
+      }
+    </style>
+    <title></title>
+  </head>
+  <body class="application">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" role="navigation">
+      <div class="container-fluid">
+      <a class="navbar-brand" href="#">IoT Dashboard</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <!--
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Dropdown
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Another action</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Disabled</a>
+          </li>-->
+        </ul>
+        <!--
+        <form class="form-inline my-2 my-lg-0">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form> -->
+      </div>
+    </div>
+    </nav>
+
+    <div class="container-fluid">
+      <!-- Overall Section -->
+      <div class="row">
+        <div class="col-lg-9">
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              <p class="h6">
+                Overall Chart
+              </p>
+            </div>
+            <div class="chart-stage">
+              <div class="plot" id="plot">
+              </div>
+            </div>
+            <!--
+            <div class="chart-notes">
+            </div> -->
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              <p class="h6">
+                Information
+              </p>
+            </div>
+            <div class="chart-stage">
+              <div><span class="info">Device ID - </span><strong class="info" id="device_id"></strong></div>
+              <div><span class="info">Name - </span><strong class="info" id="name"></strong></div>
+              <div><span class="info">From - </span><strong class="info" id="from_time"></strong></div>
+              <div><span class="info">To - </span><strong class="info" id="to_time"></strong></div>
+              <div><span class="info">Data Count - </span><strong class="info" id="data_count"></strong></div>
+            </div>
+            <div class="chart-notes">
+              <p id="attributes">Attributes:
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Elements Section -->
+    </div>
+
+    <!-- <p class="heading-1"><span>Overall</span></p> -->
+
+    <!-- http://api.airveda.com/core/averagedMonitorData/?device_id=1204170035&start_time=20171026000000&end_time=20171027000000&token=55070c712a3cd62147fd18046ae3fd0b -->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <script>
+      var data = {"device_id": "1201180152", "name": "Heinrich Boll Foundation Office", "readings": [{"aqi": 15, "pm10": 15.0, "pm25": 7.0, "time": "2018-06-05 00:30:00+00:00"}, {"aqi": 14, "pm10": 14.0, "pm25": 4.0, "time": "2018-06-05 01:00:00+00:00"}, {"aqi": 14, "pm10": 14.0, "pm25": 3.0, "time": "2018-06-05 01:30:00+00:00"}, {"aqi": 9, "pm10": 9.0, "pm25": 2.0, "time": "2018-06-05 02:00:00+00:00"}, {"aqi": 11, "pm10": 11.0, "pm25": 2.0, "time": "2018-06-05 02:30:00+00:00"}, {"aqi": 10, "pm10": 10.0, "pm25": 2.0, "time": "2018-06-05 03:00:00+00:00"}, {"aqi": 12, "pm10": 12.0, "pm25": 3.0, "time": "2018-06-05 03:30:00+00:00"}, {"aqi": 9, "pm10": 9.0, "pm25": 2.0, "time": "2018-06-05 04:00:00+00:00"}, {"aqi": 8, "pm10": 8.0, "pm25": 2.0, "time": "2018-06-05 04:30:00+00:00"}, {"aqi": 10, "pm10": 10.0, "pm25": 2.0, "time": "2018-06-05 05:00:00+00:00"}, {"aqi": 7, "pm10": 7.0, "pm25": 1.0, "time": "2018-06-05 05:30:00+00:00"}, {"aqi": 5, "pm10": 5.0, "pm25": 1.0, "time": "2018-06-05 06:00:00+00:00"}, {"aqi": 5, "pm10": 5.0, "pm25": 1.0, "time": "2018-06-05 06:30:00+00:00"}, {"aqi": 6, "pm10": 6.0, "pm25": 2.0, "time": "2018-06-05 07:00:00+00:00"}, {"aqi": 5, "pm10": 5.0, "pm25": 2.0, "time": "2018-06-05 07:30:00+00:00"}, {"aqi": 9, "pm10": 9.0, "pm25": 3.0, "time": "2018-06-05 08:00:00+00:00"}, {"aqi": 10, "pm10": 10.0, "pm25": 4.0, "time": "2018-06-05 08:30:00+00:00"}, {"aqi": 10, "pm10": 10.0, "pm25": 3.0, "time": "2018-06-05 09:00:00+00:00"}, {"aqi": 10, "pm10": 10.0, "pm25": 4.0, "time": "2018-06-05 09:30:00+00:00"}, {"aqi": 17, "pm10": 17.0, "pm25": 5.0, "time": "2018-06-05 10:00:00+00:00"}, {"aqi": 16, "pm10": 16.0, "pm25": 7.0, "time": "2018-06-05 10:30:00+00:00"}, {"aqi": 16, "pm10": 16.0, "pm25": 5.0, "time": "2018-06-05 11:00:00+00:00"}, {"aqi": 19, "pm10": 19.0, "pm25": 5.0, "time": "2018-06-05 11:30:00+00:00"}, {"aqi": 17, "pm10": 17.0, "pm25": 5.0, "time": "2018-06-05 12:00:00+00:00"}, {"aqi": 20, "pm10": 20.0, "pm25": 6.0, "time": "2018-06-05 12:30:00+00:00"}, {"aqi": 20, "pm10": 20.0, "pm25": 6.0, "time": "2018-06-05 13:00:00+00:00"}, {"aqi": 19, "pm10": 19.0, "pm25": 6.0, "time": "2018-06-05 13:30:00+00:00"}, {"aqi": 20, "pm10": 20.0, "pm25": 7.0, "time": "2018-06-05 14:00:00+00:00"}, {"aqi": 19, "pm10": 19.0, "pm25": 6.0, "time": "2018-06-05 14:30:00+00:00"}, {"aqi": 19, "pm10": 19.0, "pm25": 6.0, "time": "2018-06-05 15:00:00+00:00"}, {"aqi": 18, "pm10": 18.0, "pm25": 6.0, "time": "2018-06-05 15:30:00+00:00"}, {"aqi": 17, "pm10": 17.0, "pm25": 4.0, "time": "2018-06-05 16:00:00+00:00"}, {"aqi": 16, "pm10": 16.0, "pm25": 4.0, "time": "2018-06-05 16:30:00+00:00"}, {"aqi": 21, "pm10": 21.0, "pm25": 5.0, "time": "2018-06-05 17:00:00+00:00"}, {"aqi": 16, "pm10": 16.0, "pm25": 4.0, "time": "2018-06-05 17:30:00+00:00"}, {"aqi": 10, "pm10": 10.0, "pm25": 4.0, "time": "2018-06-05 18:00:00+00:00"}, {"aqi": 7, "pm10": 7.0, "pm25": 4.0, "time": "2018-06-05 18:30:00+00:00"}, {"aqi": 7, "pm10": 7.0, "pm25": 2.0, "time": "2018-06-05 19:00:00+00:00"}, {"aqi": 6, "pm10": 6.0, "pm25": 3.0, "time": "2018-06-05 19:30:00+00:00"}, {"aqi": 6, "pm10": 5.0, "pm25": 4.0, "time": "2018-06-05 20:00:00+00:00"}, {"aqi": 6, "pm10": 6.0, "pm25": 4.0, "time": "2018-06-05 20:30:00+00:00"}, {"aqi": 8, "pm10": 8.0, "pm25": 4.0, "time": "2018-06-05 21:00:00+00:00"}, {"aqi": 10, "pm10": 10.0, "pm25": 5.0, "time": "2018-06-05 21:30:00+00:00"}, {"aqi": 14, "pm10": 14.0, "pm25": 5.0, "time": "2018-06-05 22:00:00+00:00"}, {"aqi": 13, "pm10": 13.0, "pm25": 5.0, "time": "2018-06-05 22:30:00+00:00"}, {"aqi": 18, "pm10": 18.0, "pm25": 7.0, "time": "2018-06-05 23:00:00+00:00"}, {"aqi": 21, "pm10": 21.0, "pm25": 7.0, "time": "2018-06-05 23:30:00+00:00"}]};
+      console.log(data);
+      function fetchData(url,callback){
+        $.ajax({
+          type: "GET",
+          url: url,
+          ContentType: 'application/json; charset=utf-8',
+          dataType: 'json',
+          crossDomain:true,
+          success: callback
+        });
+      }
+
+      function beta(){
+        let xaxis = data.readings.map(function(element){return element.time});
+        let traces = [];
+        let keys = Object.keys(data.readings[0]);
+        for(i in keys){
+          if(keys[i]!="time"){
+            traces[traces.length] = {
+              x: xaxis,
+              y:data.readings.map(function(element){return element[keys[i]]}),
+              name: keys[i]
+            };
+          }
+        }
+        drawChart(document.getElementById("plot"),traces);
+        setInfo({
+            id:data.device_id,
+            name:data.name,
+            from: data.readings[0].time,
+            to: data.readings[data.readings.length-1].time,
+            count: data.readings.length
+          });
+          setAttributes(keys);
+          $( window ).resize(function(){
+            drawChart(document.getElementById("plot"),traces)
+          });
+      }
+
+      function setInfo(para){
+        $("#device_id").html(para.id);
+        $("#name").html(para.name);
+        $("#from_time").html(para.from);
+        $("#to_time").html(para.to);
+        $("#data_count").html(para.count);
+      }
+
+      function setAttributes(attrs){
+        for(i in attrs){
+          $("#attributes").append("<a href='#'>"+attrs[i]+"</a>"+(i==attrs.length-1?"":", "));
+        }
+      }
+
+      function drawChart(plotDiv,traces){
+        Plotly.newPlot(
+          plotDiv,
+          traces,
+          {
+            margin: {t:0,r:30,b:50,l:30,pad:4},
+            hovermode:'closest',
+            autosize: true
+          }
+        );
+      }
+
+      $(document).ready(function(){
+
+        /*fetchData(
+          "http://api.airveda.com/core/averagedMonitorData/?device_id=1204170035&start_time=20171026000000&end_time=20171027000000&token=55070c712a3cd62147fd18046ae3fd0b",
+        });*/
+        beta();
+      });
+    </script>
+  </body>
+</html>
